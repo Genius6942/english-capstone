@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>English Capstone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <progress id="progress" value="0" max="100"></progress>
+    <script type="module" src="/src/main.ts"></script>
+    <div
+      id="typewriter"
+      class="fixed w-screen bottom-0 z-50 p-5 backdrop-blur-xs bg-[rgba(255,255,255,.3)] hidden"
+    >
+      <div class="rounded-3xl border-yellow-700 border-8 p-5 bg-white flex">
+        <div class="w-full relative mr-3">
+          <div id="text" class="absolute top-0 left-0 w-full">
+          </div>
+          <div id="text-hidden" class="text-transparent select-none">
+          </div>
+					<div class="text-gray-500 font-mono text-end">
+						[Space to continue]
+					</div>
+        </div>
+        <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking"/>
+      </div>
+    </div>
+  </body>
+</html>
