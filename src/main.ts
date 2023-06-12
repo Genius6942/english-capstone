@@ -31,6 +31,8 @@ export const images = {
   doorUnlockedLeft: "/assets/door/door_unlocked_left.png",
   doorUnlockedRight: "/assets/door/door_unlocked_right.png",
   doorFullReversed: "/assets/door/door_full_reversed.png",
+  avatarCharacter: "/assets/characters/avatar_character.png",
+  avatarIcon: "/assets/characters/avatar_icon.png",
 };
 
 // load images
@@ -46,7 +48,8 @@ loadImages(images, (loaded, total) => {
     layer: 1,
     color: "blue",
     update: (body) => {
-      playerState.animation = (playerState.animation + 1) % (playerAnimationLength * 2);
+      playerState.animation =
+        (playerState.animation + 1) % (playerAnimationLength * 2);
       if (body.v.x > 0) {
         playerState.dir = 1;
         playerState.moving = true;
@@ -129,12 +132,18 @@ loadImages(images, (loaded, total) => {
 
   renderer.beforeRender(() => {
     renderer.camera.pos.x = 0;
+    // console.log(renderer.camera.pos.x);
     renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
   });
 
   const doorWallMargin = 0;
 
-	
+  let pauseRender = false;
+  const restartRender = () => {
+    pauseRender = false;
+    requestAnimationFrame(animationLoop);
+  };
+
   const doors = [
     door(
       images,
@@ -142,7 +151,10 @@ loadImages(images, (loaded, total) => {
       window.innerWidth / 2 - 50 - 50 - doorWallMargin,
       window.innerHeight / 2 - 50 - 75,
       "right",
-      () => room({ images })
+      async () => {
+        await room({ images, charIndex: 'avatarCharacter', iconIndex: 'avatarIcon' });
+        restartRender();
+      }
     ),
   ];
   doors.forEach(
@@ -160,9 +172,10 @@ loadImages(images, (loaded, total) => {
   ).then(closeTypewriter);
   // rendering loop
   const animationLoop = () => {
+    if (pauseRender) return;
     // update physics
     renderer.update();
-
+    
     // respawn player if needed
     if (player.y - player.height / 2 > renderer.height) {
       player.v.y = 0;

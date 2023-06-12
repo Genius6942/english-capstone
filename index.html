@@ -10,21 +10,47 @@
   <body>
     <progress id="progress" value="0" max="100"></progress>
     <script type="module" src="/src/main.ts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      try {
+        eruda.init({
+          defaults: {
+            displaySize: 30,
+            theme: "Atom One Dark",
+            transparency: 1,
+          },
+        });
+        if (localStorage.getItem("eruda-auto-show") === "1") eruda.show();
+        window.addEventListener("keydown", (e) => {
+          const { key, ctrlKey } = e;
+          if (key === "e" && ctrlKey) {
+            e.preventDefault();
+            if (localStorage.getItem("eruda-auto-show") === "1") {
+              localStorage.setItem("eruda-auto-show", "0");
+              eruda.hide();
+            } else {
+              localStorage.setItem("eruda-auto-show", "1");
+              eruda.show();
+            }
+          }
+        });
+      } catch (e) {
+        alert(e);
+      }
+    </script>
     <div
       id="typewriter"
       class="fixed w-screen bottom-0 z-50 p-5 backdrop-blur-xs bg-[rgba(255,255,255,.3)] hidden"
     >
       <div class="rounded-3xl border-yellow-700 border-8 p-5 bg-white flex">
         <div class="w-full relative mr-3">
-          <div id="text" class="absolute top-0 left-0 w-full">
+          <div id="text" class="absolute top-0 left-0 w-full"></div>
+          <div id="text-hidden" class="text-transparent select-none"></div>
+          <div class="text-gray-500 font-mono text-end">
+            [Space to continue]
           </div>
-          <div id="text-hidden" class="text-transparent select-none">
-          </div>
-					<div class="text-gray-500 font-mono text-end">
-						[Space to continue]
-					</div>
         </div>
-        <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking"/>
+        <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking" />
       </div>
     </div>
   </body>
