@@ -1,11 +1,32 @@
-const $ = <T = HTMLElement>(query: string) => document.querySelector(query) as T;
+const $ = <T = HTMLElement>(query: string) =>
+  document.querySelector(query) as T;
 
-export const openTypewriter = (image = "/assets/player/player_left_standstill.png") => {
+export const openTypewriter = ({
+  image = "/assets/player/player_left_standstill.png",
+  title = null,
+  name = null,
+}: {
+  image?: string;
+  title?: string | null;
+  name?: string | null;
+} = {}) => {
   $("#typewriter").style.display = "block";
   $<HTMLImageElement>("#speaking").src = image;
+  if (title) {
+    $("#title").innerHTML = title + '\n';
+  }
+  if (name) {
+    $("#name").innerHTML = name;
+  }
 };
 
-export const writeTypewriter = (text: string, speed = 50) =>
+export const writeTypewriter = ({
+  text,
+  speed = 50,
+}: {
+  text: string;
+  speed?: number;
+}) =>
   new Promise<void>((resolve) => {
     let done = false;
     const box = $("#text");
@@ -52,4 +73,6 @@ export const closeTypewriter = () => {
   $("#typewriter").style.display = "none";
   $("#text").innerHTML = "";
   $("#text-hidden").innerHTML = "";
+  $("#name").innerHTML = "";
+  $("#title").innerHTML = "";
 };

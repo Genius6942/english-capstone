@@ -15,6 +15,13 @@ export default (
   const yGap = 200;
 
   const stairs: StaticBody[] = [];
+  const camelCase = (str: string) => {
+    return str
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+      })
+      .replace(/\s+/g, "");
+  };
 
   const doors = sources.map((source, idx) => {
     const side = idx % 2 === 0 ? "right" : "left";
@@ -28,10 +35,14 @@ export default (
       pauseRender();
       await room({
         images,
-        charIndex: (source.name.toLowerCase() + "Character") as keyof typeof imageUrls,
+        charIndex: (camelCase(source.name) + "Character") as keyof typeof imageUrls,
         iconUrl:
-          imageUrls[(source.name.toLowerCase() + "Icon") as keyof typeof imageUrls],
+          imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
+        bgImage: images[camelCase(source.name) + "Background" as keyof typeof imageUrls],
         texts: source.textChunks,
+        name: source.name,
+        charName: source.character,
+        overrides: source.overrides
       });
       player.v = { x: 0, y: 0 };
       player.x =
@@ -50,7 +61,7 @@ export default (
     const totalYGap = yGap + 150 - stairYGap;
     const stairsNeeded = Math.ceil(totalYGap / stairYGap);
     const stairWidth = totalStairWidth / stairsNeeded - stairXGap;
-    const stairHeight = 20;
+    const stairHeight = 15;
     const generatedStairs = Array.from({ length: stairsNeeded }).map((_, idx) => {
       const stair = new StaticBody({
         x:

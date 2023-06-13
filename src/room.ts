@@ -75,10 +75,14 @@ export const door = (
       // if (activated) return;
       // if player is completely inside the outer door fire the onActivate callback
       if (
-        player.x - Math.abs(player.width) / 2 >= outer.x - Math.abs(outer.width) / 2 &&
-        player.x + Math.abs(player.width) / 2 <= outer.x + Math.abs(outer.width) / 2 &&
-        player.y - Math.abs(player.height) / 2 >= outer.y - Math.abs(outer.height) / 2 &&
-        player.y + Math.abs(player.height) / 2 <= outer.y + Math.abs(outer.height) / 2
+        player.x - Math.abs(player.width) / 2 >=
+          outer.x - Math.abs(outer.width) / 2 &&
+        player.x + Math.abs(player.width) / 2 <=
+          outer.x + Math.abs(outer.width) / 2 &&
+        player.y - Math.abs(player.height) / 2 >=
+          outer.y - Math.abs(outer.height) / 2 &&
+        player.y + Math.abs(player.height) / 2 <=
+          outer.y + Math.abs(outer.height) / 2
       ) {
         activated = true;
         onActivate();
@@ -92,16 +96,98 @@ type Images = {
   [k in keyof Awaited<typeof import("./main")>["imageUrls"]]: HTMLImageElement;
 };
 
+/**
+ * By Ken Fyrstenberg Nilsen
+ *
+ * drawImageProp(context, image [, x, y, width, height [,offsetX, offsetY]])
+ *
+ * If image and context are only arguments rectangle will equal canvas
+ */
+function drawImageProp(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x?: number,
+  y?: number,
+  w?: number,
+  h?: number,
+  offsetX?: number,
+  offsetY?: number
+) {
+  if (arguments.length === 2) {
+    x = y = 0;
+    w = ctx.canvas.width;
+    h = ctx.canvas.height;
+  }
+
+  // default offset is center
+  offsetX = typeof offsetX === "number" ? offsetX : 0.5;
+  offsetY = typeof offsetY === "number" ? offsetY : 0.5;
+
+  // keep bounds [0.0, 1.0]
+  if (offsetX < 0) offsetX = 0;
+  if (offsetY < 0) offsetY = 0;
+  if (offsetX > 1) offsetX = 1;
+  if (offsetY > 1) offsetY = 1;
+
+  var iw = img.width,
+    ih = img.height,
+    //@ts-ignore
+    r = Math.min(w / iw, h / ih),
+    nw = iw * r, // new prop. width
+    nh = ih * r, // new prop. height
+    cx,
+    cy,
+    cw,
+    ch,
+    ar = 1;
+
+  // decide which gap to fill
+  // @ts-ignore
+  if (nw < w) ar = w / nw;
+  // @ts-ignore
+  if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh; // updated
+  nw *= ar;
+  nh *= ar;
+
+  // calc source rectangle
+  // @ts-ignore
+  cw = iw / (nw / w);
+  // @ts-ignore
+  ch = ih / (nh / h);
+
+  cx = (iw - cw) * offsetX;
+  cy = (ih - ch) * offsetY;
+
+  // make sure source rectangle is valid
+  if (cx < 0) cx = 0;
+  if (cy < 0) cy = 0;
+  if (cw > iw) cw = iw;
+  if (ch > ih) ch = ih;
+
+  // fill image in dest. rectangle
+  // @ts-ignore
+  ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+}
+
 export const room = ({
   images,
   charIndex,
   iconUrl,
+  // @ts-ignore
+  bgImage,
   texts,
+  name,
+  charName,
+  overrides = {},
 }: {
   images: Images;
   charIndex: keyof Images;
   iconUrl: string;
+  bgImage: HTMLImageElement;
+  name: string;
+  charName: string;
   texts: string[];
+  overrides?: Partial<{ charHeight: number }>;
 }) =>
   new Promise<void>(async (resolve) => {
     try {
@@ -113,6 +199,10 @@ export const room = ({
         .enableFixedPosition()
         .enablePhysics({})
         .resize();
+
+      // code below doesnt work smh
+      // renderer.style.backgroundImage = "url(" + bgUrl + ")";
+      // renderer.style.backgroundSize = "cover";
 
       renderer.style.zIndex = "10";
 
@@ -227,14 +317,18 @@ export const room = ({
         })
       );
 
-      const characterHeight = 120;
+      const characterHeight = overrides.charHeight || 120;
       const characterWallMargin = 50;
       const characterWidth =
         images[charIndex].naturalWidth *
         (characterHeight / images[charIndex].naturalHeight);
       const character = renderer.add(
         new StaticBody({
-          x: window.innerWidth / 2 - 50 - characterWallMargin - characterWidth / 2,
+          x:
+            window.innerWidth / 2 -
+            50 -
+            characterWallMargin -
+            characterWidth / 2,
           y: window.innerHeight / 2 - 50 - characterHeight / 2,
           width: characterWidth,
           height: characterHeight,
@@ -251,12 +345,12 @@ export const room = ({
           speaking = true;
           withinRange = false;
           window.removeEventListener("keydown", speakingListener);
-          (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
-            "hidden"
-          );
-          openTypewriter(iconUrl);
+          (
+            document.querySelector("#caninteract") as HTMLDivElement
+          ).classList.add("hidden");
+          openTypewriter({ image: iconUrl, name: charName, title: name });
           for (const text of texts) {
-            await writeTypewriter(text);
+            await writeTypewriter({ text });
           }
           closeTypewriter();
           speaking = false;
@@ -272,20 +366,21 @@ export const room = ({
         if (speaking) return;
         // x range indluding width of player and character
         const range =
-          Math.abs(player.x - character.x) - (player.width + character.width) / 2;
+          Math.abs(player.x - character.x) -
+          (player.width + character.width) / 2;
 
         if (range < requiredRange !== withinRange) {
           if (range < requiredRange) {
-            (document.querySelector("#caninteract") as HTMLDivElement).classList.remove(
-              "hidden"
-            );
+            (
+              document.querySelector("#caninteract") as HTMLDivElement
+            ).classList.remove("hidden");
             window.addEventListener("keydown", speakingListener);
             console.log("toggle on");
             withinRange = true;
           } else {
-            (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
-              "hidden"
-            );
+            (
+              document.querySelector("#caninteract") as HTMLDivElement
+            ).classList.add("hidden");
             window.removeEventListener("keydown", speakingListener);
             console.log("toggle off");
             withinRange = false;
@@ -296,10 +391,14 @@ export const room = ({
       renderer.beforeRender(() => {
         renderer.camera.pos.x = 0;
         renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
+        // drawImageProp(renderer.ctx, bgImage)
       });
 
       const animationLoop = async () => {
-        if (spoken && player.x + player.width / 2 < -window.innerWidth / 2 - 50) {
+        if (
+          spoken &&
+          player.x + player.width / 2 < -window.innerWidth / 2 - 50
+        ) {
           await showCover();
           setTimeout(() => {
             hideCover({});

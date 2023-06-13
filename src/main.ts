@@ -35,6 +35,12 @@ export const imageUrls = {
   doorFullReversed: "/assets/door/door_full_reversed.png",
   avatarCharacter: "/assets/characters/avatar_character.png",
   avatarIcon: "/assets/characters/avatar_icon.png",
+  avatarBackground: "/assets/backgrounds/avatar.jpg",
+  byTheWatersOfBabylonCharacter:
+    "/assets/characters/byTheWatersOfBabylon_character.png",
+  byTheWatersOfBabylonIcon: "/assets/characters/byTheWatersOfBabylon_icon.png",
+  byTheWatersOfBabylonBackground:
+    "/assets/backgrounds/byTheWatersOfBabylon.jpg",
 };
 
 // load images
@@ -50,7 +56,8 @@ loadImages(imageUrls, (loaded, total) => {
     layer: 1,
     color: "blue",
     update: (body) => {
-      playerState.animation = (playerState.animation + 1) % (playerAnimationLength * 2);
+      playerState.animation =
+        (playerState.animation + 1) % (playerAnimationLength * 2);
       if (body.v.x > 0) {
         playerState.dir = 1;
         playerState.moving = true;
@@ -97,6 +104,20 @@ loadImages(imageUrls, (loaded, total) => {
 
   // enable keyboard controls
   player.bindKeyboardControls({ spaceJump: false });
+  player.jump = () => {
+    {
+      if (player.jumps < player.maxJumps) {
+        player.v.y = -player.jumpVel;
+        player.jumps++;
+        player.y -= 1;
+        if (player.wallSide === 0) {
+          player.v.x = -player.wallPushOffSpeed;
+        } else if (player.wallSide === 2) {
+          player.v.x = player.wallPushOffSpeed;
+        }
+      }
+    }
+  };
 
   // lock the camera to the player (player st	ays at center of the screen)
   renderer.camera.lock(player, { minXSpace: 0, minYSpace: 100 });
@@ -159,15 +180,16 @@ loadImages(imageUrls, (loaded, total) => {
   map.stairs.forEach((stair) => renderer.add(stair));
 
   openTypewriter();
-  writeTypewriter(
-    "Hi mom! i love you lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. yay",
-    50
-  ).then(closeTypewriter);
+  writeTypewriter({
+    text: "Hi mom! i love you lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. yay",
+  }).then(closeTypewriter);
   // rendering loop
   const animationLoop = () => {
     if (pauseRender) return;
     // update physics
+    // player.y -= 1;
     renderer.update();
+    // player.y += 1;
 
     // respawn player if needed
     if (player.y - player.height / 2 > renderer.height) {

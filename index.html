@@ -44,11 +44,24 @@
     >
       <div class="rounded-3xl border-yellow-700 border-8 p-5 bg-white flex">
         <div class="w-full relative mr-3">
-          <div id="text" class="absolute top-0 left-0 w-full"></div>
-          <div id="text-hidden" class="text-transparent select-none"></div>
-          <div class="text-gray-500 font-mono text-end">[Space to continue]</div>
+          <div class="empty:hidden italic whitespace-pre" id="title"></div>
+          <div class="w-full relative">
+            <div id="text" class="absolute top-0 left-0 w-full"></div>
+            <div id="text-hidden" class="text-transparent select-none"></div>
+            <div class="text-gray-500 font-mono text-end">
+              [Space to continue]
+            </div>
+          </div>
         </div>
-        <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking" />
+        <div class="flex flex-col items-center">
+          <img
+            height="100"
+            alt="char"
+            class="ml-auto h-[100px]"
+            id="speaking"
+          />
+          <div id="name" class="whitespace-nowrap empty:hidden"></div>
+        </div>
       </div>
     </div>
     <div
@@ -57,7 +70,10 @@
     >
       Space to interact
     </div>
-		<div id="fade" class="fixed top-0 left-0 right-0 bottom-0 z-[100000000000] pointer-events-none opacity-0 bg-black"></div>
+    <div
+      id="fade"
+      class="fixed top-0 left-0 right-0 bottom-0 z-[100000000000] pointer-events-none opacity-0 bg-black"
+    ></div>
     <style>
       /* #caninteract {
         transition: all 0.2s ease;
