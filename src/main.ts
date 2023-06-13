@@ -2,6 +2,8 @@ import "./style.css";
 import { ControlledBody, StaticBody, Renderer, loadImages } from "platjs";
 import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
 import { door, room } from "./room";
+import genMap from "./genMap";
+import sources from "./sources";
 
 // Create a renderer
 // This handles physics and rendering for you.
@@ -20,7 +22,7 @@ const playerState = {
 };
 const playerAnimationLength = 10;
 
-export const images = {
+export const imageUrls = {
   playerLeftStandstill: "/assets/player/player_left_standstill.png",
   playerRightStandstill: "/assets/player/player_right_standstill.png",
   playerLeftWalk1: "/assets/player/player_left_walk_1.png",
@@ -36,7 +38,7 @@ export const images = {
 };
 
 // load images
-loadImages(images, (loaded, total) => {
+loadImages(imageUrls, (loaded, total) => {
   (document.querySelector("progress") as HTMLProgressElement).value =
     (loaded / total) * 100;
 }).then((images) => {
@@ -48,8 +50,7 @@ loadImages(images, (loaded, total) => {
     layer: 1,
     color: "blue",
     update: (body) => {
-      playerState.animation =
-        (playerState.animation + 1) % (playerAnimationLength * 2);
+      playerState.animation = (playerState.animation + 1) % (playerAnimationLength * 2);
       if (body.v.x > 0) {
         playerState.dir = 1;
         playerState.moving = true;
@@ -136,34 +137,26 @@ loadImages(images, (loaded, total) => {
     renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
   });
 
-  const doorWallMargin = 0;
-
   let pauseRender = false;
   const restartRender = () => {
     pauseRender = false;
     requestAnimationFrame(animationLoop);
   };
 
-  const doors = [
-    door(
-      images,
-      player,
-      window.innerWidth / 2 - 50 - 50 - doorWallMargin,
-      window.innerHeight / 2 - 50 - 75,
-      "right",
-      async () => {
-        await room({ images, charIndex: 'avatarCharacter', iconIndex: 'avatarIcon' });
-        restartRender();
-      }
-    ),
-  ];
-  doors.forEach(
-    (door) =>
-      renderer.add(door.closedDoor) &&
-      renderer.add(door.doorCeiling) &&
-      renderer.beforeRender(door.update)
+  const map = genMap(
+    sources,
+    images,
+    player,
+    () => {
+      pauseRender = true;
+    },
+    restartRender,
+    renderer
   );
-  doors[0].open(renderer);
+  map.objects.forEach((obj) => renderer.add(obj));
+  map.doors.forEach((door) => renderer.beforeRender(door.update));
+  map.doors[0].open(renderer);
+  map.stairs.forEach((stair) => renderer.add(stair));
 
   openTypewriter();
   writeTypewriter(
@@ -175,7 +168,7 @@ loadImages(images, (loaded, total) => {
     if (pauseRender) return;
     // update physics
     renderer.update();
-    
+
     // respawn player if needed
     if (player.y - player.height / 2 > renderer.height) {
       player.v.y = 0;

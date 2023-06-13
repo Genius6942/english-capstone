@@ -46,12 +46,26 @@
         <div class="w-full relative mr-3">
           <div id="text" class="absolute top-0 left-0 w-full"></div>
           <div id="text-hidden" class="text-transparent select-none"></div>
-          <div class="text-gray-500 font-mono text-end">
-            [Space to continue]
-          </div>
+          <div class="text-gray-500 font-mono text-end">[Space to continue]</div>
         </div>
         <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking" />
       </div>
     </div>
+    <div
+      id="caninteract"
+      class="hidden fixed bottom-3 left-1/2 opacity-100 -translate-x-1/2 rounded-full p-3 border-4 border-black bg-white z-[100000000000] transition-all select-none pointer-events-none"
+    >
+      Space to interact
+    </div>
+		<div id="fade" class="fixed top-0 left-0 right-0 bottom-0 z-[100000000000] pointer-events-none opacity-0 bg-black"></div>
+    <style>
+      /* #caninteract {
+        transition: all 0.2s ease;
+      } */
+      #caninteract.hidden {
+        bottom: -100px;
+        opacity: 0;
+      }
+    </style>
   </body>
 </html>

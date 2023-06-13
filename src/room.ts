@@ -1,10 +1,6 @@
-import {
-  ControlledBody,
-  GameObject,
-  PhysicalBody,
-  Renderer,
-  StaticBody,
-} from "platjs";
+import { ControlledBody, GameObject, Renderer, StaticBody } from "platjs";
+import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
+import { hideCover, showCover } from "./fade";
 
 export const door = (
   images: {
@@ -48,6 +44,15 @@ export const door = (
     image: side === "left" ? images.doorFull : images.doorFullReversed,
   });
 
+  const doorFloor = new StaticBody({
+    x: x,
+    y: y + height / 2 + 5,
+    width: width * 2,
+    height: 10,
+    layer: 0,
+    color: "black",
+  });
+
   return {
     closedDoor,
     doorCeiling: new StaticBody({
@@ -58,6 +63,7 @@ export const door = (
       layer: 0,
       color: "transparent",
     }),
+    doorFloor,
     parts: [inner, outer],
     open: (renderer: Renderer) => {
       renderer.destroy(closedDoor);
@@ -66,17 +72,13 @@ export const door = (
     },
     update: () => {
       // draw first
-      if (activated) return;
+      // if (activated) return;
       // if player is completely inside the outer door fire the onActivate callback
       if (
-        player.x - Math.abs(player.width) / 2 >=
-          outer.x - Math.abs(outer.width) / 2 &&
-        player.x + Math.abs(player.width) / 2 <=
-          outer.x + Math.abs(outer.width) / 2 &&
-        player.y - Math.abs(player.height) / 2 >=
-          outer.y - Math.abs(outer.height) / 2 &&
-        player.y + Math.abs(player.height) / 2 <=
-          outer.y + Math.abs(outer.height) / 2
+        player.x - Math.abs(player.width) / 2 >= outer.x - Math.abs(outer.width) / 2 &&
+        player.x + Math.abs(player.width) / 2 <= outer.x + Math.abs(outer.width) / 2 &&
+        player.y - Math.abs(player.height) / 2 >= outer.y - Math.abs(outer.height) / 2 &&
+        player.y + Math.abs(player.height) / 2 <= outer.y + Math.abs(outer.height) / 2
       ) {
         activated = true;
         onActivate();
@@ -87,27 +89,32 @@ export const door = (
 
 // type T is imported images from main.ts
 type Images = {
-  [k in keyof Awaited<typeof import("./main")>["images"]]: HTMLImageElement;
+  [k in keyof Awaited<typeof import("./main")>["imageUrls"]]: HTMLImageElement;
 };
 
 export const room = ({
   images,
   charIndex,
-  iconIndex,
+  iconUrl,
+  texts,
 }: {
   images: Images;
   charIndex: keyof Images;
-  iconIndex: keyof Images;
+  iconUrl: string;
+  texts: string[];
 }) =>
-  new Promise<void>((resolve) => {
+  new Promise<void>(async (resolve) => {
     try {
+      // fade in yay
+      await showCover();
+
       const renderer = new Renderer()
         .mount(document.body)
         .enableFixedPosition()
         .enablePhysics({})
         .resize();
 
-      renderer.style.zIndex = "1000000";
+      renderer.style.zIndex = "10";
 
       renderer.style.backgroundColor = "white";
 
@@ -197,6 +204,7 @@ export const room = ({
           height: window.innerHeight - doorGapHeight,
           width: 100,
           color: "black",
+          layer: 1,
         })
       );
       renderer.add(
@@ -218,14 +226,14 @@ export const room = ({
           color: "gray",
         })
       );
-      const characterHeight = 90;
+
+      const characterHeight = 120;
       const characterWallMargin = 50;
       const characterWidth =
         images[charIndex].naturalWidth *
         (characterHeight / images[charIndex].naturalHeight);
-      console.log(characterHeight, characterWidth);
       const character = renderer.add(
-        new PhysicalBody({
+        new StaticBody({
           x: window.innerWidth / 2 - 50 - characterWallMargin - characterWidth / 2,
           y: window.innerHeight / 2 - 50 - characterHeight / 2,
           width: characterWidth,
@@ -235,32 +243,76 @@ export const room = ({
         })
       );
 
-      console.log(
-        {
-          x:
-            window.innerWidth / 2 -
-            50 -
-            characterWallMargin -
-            characterWidth / 2,
-          y: window.innerHeight / 2 - 50 - characterHeight / 2,
-          width: characterWidth,
-          height: characterHeight,
-          image: images[charIndex],
-        },
-        character
-      );
+      let speaking = false;
+      let spoken = false;
+
+      const speakingListener = async (e: KeyboardEvent) => {
+        if (e.key === " ") {
+          speaking = true;
+          withinRange = false;
+          window.removeEventListener("keydown", speakingListener);
+          (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
+            "hidden"
+          );
+          openTypewriter(iconUrl);
+          for (const text of texts) {
+            await writeTypewriter(text);
+          }
+          closeTypewriter();
+          speaking = false;
+          spoken = true;
+
+          // renderer.destroy(door);
+        }
+      };
+
+      let withinRange = false;
+      const requiredRange = 20;
+      const updateRange = () => {
+        if (speaking) return;
+        // x range indluding width of player and character
+        const range =
+          Math.abs(player.x - character.x) - (player.width + character.width) / 2;
+
+        if (range < requiredRange !== withinRange) {
+          if (range < requiredRange) {
+            (document.querySelector("#caninteract") as HTMLDivElement).classList.remove(
+              "hidden"
+            );
+            window.addEventListener("keydown", speakingListener);
+            console.log("toggle on");
+            withinRange = true;
+          } else {
+            (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
+              "hidden"
+            );
+            window.removeEventListener("keydown", speakingListener);
+            console.log("toggle off");
+            withinRange = false;
+          }
+        }
+      };
 
       renderer.beforeRender(() => {
         renderer.camera.pos.x = 0;
         renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
       });
 
-      let done = false;
-
-      const animationLoop = () => {
-        if (done) return;
+      const animationLoop = async () => {
+        if (spoken && player.x + player.width / 2 < -window.innerWidth / 2 - 50) {
+          await showCover();
+          setTimeout(() => {
+            hideCover({});
+          }, 10);
+          renderer.remove();
+          resolve();
+          return;
+        }
         // update physics
         renderer.update();
+        spoken && door.y--;
+
+        updateRange();
 
         // respawn player if needed
         if (player.y - player.height / 2 > renderer.height) {
@@ -276,6 +328,8 @@ export const room = ({
       };
 
       requestAnimationFrame(animationLoop);
+
+      setTimeout(hideCover, 10);
     } catch (e) {
       console.error(e);
     }
