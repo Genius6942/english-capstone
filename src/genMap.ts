@@ -30,7 +30,8 @@ export default (
     const doorWallMargin = 0;
 
     const x =
-      (window.innerWidth / 2 - 50 - 50 - doorWallMargin) * (side === "left" ? -1 : 1);
+      (window.innerWidth / 2 - 50 - 50 - doorWallMargin) *
+      (side === "left" ? -1 : 1);
     const y = window.innerHeight / 2 - 50 - 75 - (yGap + 150) * idx;
 
     const object = createObject(
@@ -39,14 +40,20 @@ export default (
     );
     const generatedDoor = door(images, player, x, y, side, async () => {
       pauseRender();
-			await showCover();
+      await showCover();
       object.start();
       await room({
         images,
-        charIndex: (camelCase(source.name) + "Character") as keyof typeof imageUrls,
-        iconUrl: imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
+        charIndex: (camelCase(source.name) +
+          "Character") as keyof typeof imageUrls,
+        iconUrl:
+          imageUrls[
+            (camelCase(source.name) + "Icon") as keyof typeof imageUrls
+          ],
         bgImage:
-          images[(camelCase(source.name) + "Background") as keyof typeof imageUrls],
+          images[
+            (camelCase(source.name) + "Background") as keyof typeof imageUrls
+          ],
         texts: source.textChunks,
         name: source.name,
         charName: source.character,
@@ -54,7 +61,11 @@ export default (
         onCollectObject: () => {
           const div = document.createElement("div");
           div.style.position = "fixed";
-          div.style.top = div.style.left = div.style.bottom = div.style.right = "0";
+          div.style.top =
+            div.style.left =
+            div.style.bottom =
+            div.style.right =
+              "0";
           div.style.backdropFilter = "blur(10px)";
           div.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
           div.style.zIndex = (999).toString();
@@ -66,6 +77,7 @@ export default (
             div.removeEventListener("click", clickListener);
             object.end();
             div.remove();
+            div.style.display = "none";
           };
 
           const keyListener = (e: KeyboardEvent) => {
@@ -74,11 +86,7 @@ export default (
             }
           };
           window.addEventListener("keydown", keyListener);
-          const clickListener = ({ target, currentTarget }: MouseEvent) => {
-            if (target === currentTarget) {
-              close();
-            }
-          };
+          const clickListener = close;
           div.addEventListener("click", clickListener);
         },
       });
@@ -105,24 +113,26 @@ export default (
     const stairsNeeded = Math.ceil(totalYGap / stairYGap);
     const stairWidth = totalStairWidth / stairsNeeded - stairXGap;
     const stairHeight = 15;
-    const generatedStairs = Array.from({ length: stairsNeeded }).map((_, idx) => {
-      const stair = new StaticBody({
-        x:
-          x +
-          (side === "right" ? -1 : 1) *
-            (doorWallMargin +
-              50 +
-              100 +
-              stairXGap / 2 +
-              stairWidth / 2 +
-              (stairWidth + stairXGap) * idx),
-        y: y + 50 - (stairYGap / 2 + stairHeight / 2) - idx * stairYGap,
-        width: stairWidth,
-        height: stairHeight,
-        color: "black",
-      });
-      return stair;
-    });
+    const generatedStairs = Array.from({ length: stairsNeeded }).map(
+      (_, idx) => {
+        const stair = new StaticBody({
+          x:
+            x +
+            (side === "right" ? -1 : 1) *
+              (doorWallMargin +
+                50 +
+                100 +
+                stairXGap / 2 +
+                stairWidth / 2 +
+                (stairWidth + stairXGap) * idx),
+          y: y + 50 - (stairYGap / 2 + stairHeight / 2) - idx * stairYGap,
+          width: stairWidth,
+          height: stairHeight,
+          color: "black",
+        });
+        return stair;
+      }
+    );
 
     stairs.push(...generatedStairs);
 

@@ -28,7 +28,7 @@ export const createObject = (imgUrl: string, index: number) => {
 
   const defautSize = 50;
   const enlargedSize = 400;
-  const objectGap = 50;
+  const objectGap = 20;
 
   const locations = {
     start: {
@@ -43,7 +43,7 @@ export const createObject = (imgUrl: string, index: number) => {
     },
     end: {
       x: window.innerWidth - 50 - 50,
-      y: 50 + 100 + (objectGap + defautSize) * index,
+      y: 50 + (objectGap + defautSize) * index,
       size: defautSize,
     },
   };
