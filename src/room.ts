@@ -7,6 +7,7 @@ export const door = (
     doorFull: HTMLImageElement;
     doorFullReversed: HTMLImageElement;
     doorUnlockedLeft: HTMLImageElement;
+		doorUnlockedLeftReversed: HTMLImageElement;
     doorUnlockedRight: HTMLImageElement;
   },
   player: ControlledBody,
@@ -24,7 +25,7 @@ export const door = (
     width: side === "left" ? -width / 2 : width / 2,
     height: height,
     layer: 0,
-    image: images.doorUnlockedLeft,
+    image: side === "right" ? images.doorUnlockedLeft : images.doorUnlockedLeftReversed,
   });
   const outer = new GameObject({
     x: x + (side === "left" ? -width / 4 : width / 4),
@@ -75,14 +76,10 @@ export const door = (
       // if (activated) return;
       // if player is completely inside the outer door fire the onActivate callback
       if (
-        player.x - Math.abs(player.width) / 2 >=
-          outer.x - Math.abs(outer.width) / 2 &&
-        player.x + Math.abs(player.width) / 2 <=
-          outer.x + Math.abs(outer.width) / 2 &&
-        player.y - Math.abs(player.height) / 2 >=
-          outer.y - Math.abs(outer.height) / 2 &&
-        player.y + Math.abs(player.height) / 2 <=
-          outer.y + Math.abs(outer.height) / 2
+        player.x - Math.abs(player.width) / 2 >= outer.x - Math.abs(outer.width) / 2 &&
+        player.x + Math.abs(player.width) / 2 <= outer.x + Math.abs(outer.width) / 2 &&
+        player.y - Math.abs(player.height) / 2 >= outer.y - Math.abs(outer.height) / 2 &&
+        player.y + Math.abs(player.height) / 2 <= outer.y + Math.abs(outer.height) / 2
       ) {
         activated = true;
         onActivate();
@@ -103,6 +100,7 @@ type Images = {
  *
  * If image and context are only arguments rectangle will equal canvas
  */
+// @ts-ignore
 function drawImageProp(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -178,6 +176,7 @@ export const room = ({
   texts,
   name,
   charName,
+	onCollectObject,
   overrides = {},
 }: {
   images: Images;
@@ -187,13 +186,11 @@ export const room = ({
   name: string;
   charName: string;
   texts: string[];
+	onCollectObject: () => void;
   overrides?: Partial<{ charHeight: number }>;
 }) =>
   new Promise<void>(async (resolve) => {
     try {
-      // fade in yay
-      await showCover();
-
       const renderer = new Renderer()
         .mount(document.body)
         .enableFixedPosition()
@@ -318,17 +315,13 @@ export const room = ({
       );
 
       const characterHeight = overrides.charHeight || 120;
-      const characterWallMargin = 50;
+      const characterWallMargin = player.width - 1;
       const characterWidth =
         images[charIndex].naturalWidth *
         (characterHeight / images[charIndex].naturalHeight);
       const character = renderer.add(
         new StaticBody({
-          x:
-            window.innerWidth / 2 -
-            50 -
-            characterWallMargin -
-            characterWidth / 2,
+          x: window.innerWidth / 2 - 50 - characterWallMargin - characterWidth / 2,
           y: window.innerHeight / 2 - 50 - characterHeight / 2,
           width: characterWidth,
           height: characterHeight,
@@ -345,14 +338,15 @@ export const room = ({
           speaking = true;
           withinRange = false;
           window.removeEventListener("keydown", speakingListener);
-          (
-            document.querySelector("#caninteract") as HTMLDivElement
-          ).classList.add("hidden");
-          openTypewriter({ image: iconUrl, name: charName, title: name });
+          (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
+            "hidden"
+          );
+          openTypewriter({ image: iconUrl, title: name });
           for (const text of texts) {
             await writeTypewriter({ text });
           }
           closeTypewriter();
+					onCollectObject();
           speaking = false;
           spoken = true;
 
@@ -366,21 +360,24 @@ export const room = ({
         if (speaking) return;
         // x range indluding width of player and character
         const range =
-          Math.abs(player.x - character.x) -
-          (player.width + character.width) / 2;
+          Math.abs(player.x - character.x) - (player.width + character.width) / 2;
 
         if (range < requiredRange !== withinRange) {
           if (range < requiredRange) {
-            (
-              document.querySelector("#caninteract") as HTMLDivElement
-            ).classList.remove("hidden");
+            (document.querySelector("#caninteract") as HTMLDivElement).classList.remove(
+              "hidden"
+            );
+            (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
+              "Press space to interact with " + charName + " from " + name;
             window.addEventListener("keydown", speakingListener);
             console.log("toggle on");
             withinRange = true;
           } else {
-            (
-              document.querySelector("#caninteract") as HTMLDivElement
-            ).classList.add("hidden");
+            (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
+              "hidden"
+            );
+            (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
+              "Press space to interact";
             window.removeEventListener("keydown", speakingListener);
             console.log("toggle off");
             withinRange = false;
@@ -395,10 +392,7 @@ export const room = ({
       });
 
       const animationLoop = async () => {
-        if (
-          spoken &&
-          player.x + player.width / 2 < -window.innerWidth / 2 - 50
-        ) {
+        if (spoken && player.x + player.width / 2 < -window.innerWidth / 2 - 50) {
           await showCover();
           setTimeout(() => {
             hideCover({});

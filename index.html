@@ -5,10 +5,15 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>English Capstone</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
   </head>
   <body>
-    <progress id="progress" value="0" max="100"></progress>
+    <div
+      id="loading"
+      class="fixed top-0 left-0 right-0 bottom-0 bg-white flex items-center justify-center z-[1000000000000000]"
+    >
+      <progress id="progress" value="0" max="100" class="w-96"></progress>
+    </div>
     <script type="module" src="/src/main.ts"></script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
@@ -48,31 +53,24 @@
           <div class="w-full relative">
             <div id="text" class="absolute top-0 left-0 w-full"></div>
             <div id="text-hidden" class="text-transparent select-none"></div>
-            <div class="text-gray-500 font-mono text-end">
-              [Space to continue]
-            </div>
+            <div class="text-gray-500 font-mono text-end">[Space to continue]</div>
           </div>
         </div>
         <div class="flex flex-col items-center">
-          <img
-            height="100"
-            alt="char"
-            class="ml-auto h-[100px]"
-            id="speaking"
-          />
+          <img height="100" alt="char" class="ml-auto h-[100px]" id="speaking" />
           <div id="name" class="whitespace-nowrap empty:hidden"></div>
         </div>
       </div>
     </div>
     <div
       id="caninteract"
-      class="hidden fixed bottom-3 left-1/2 opacity-100 -translate-x-1/2 rounded-full p-3 border-4 border-black bg-white z-[100000000000] transition-all select-none pointer-events-none"
+      class="hidden fixed bottom-3 left-1/2 opacity-100 -translate-x-1/2 rounded-full p-3 border-4 border-black bg-white z-[99] transition-all select-none pointer-events-none"
     >
       Space to interact
     </div>
     <div
       id="fade"
-      class="fixed top-0 left-0 right-0 bottom-0 z-[100000000000] pointer-events-none opacity-0 bg-black"
+      class="fixed top-0 left-0 right-0 bottom-0 z-[9999] pointer-events-none opacity-0 bg-black"
     ></div>
     <style>
       /* #caninteract {

@@ -1,6 +1,8 @@
 import { door, room } from "./room";
 import { imageUrls } from "./main";
 import { StaticBody } from "platjs";
+import { createObject } from "./objects";
+import { showCover } from "./fade";
 
 export default (
   sources: typeof import("./sources").default,
@@ -31,18 +33,54 @@ export default (
       (window.innerWidth / 2 - 50 - 50 - doorWallMargin) * (side === "left" ? -1 : 1);
     const y = window.innerHeight / 2 - 50 - 75 - (yGap + 150) * idx;
 
+    const object = createObject(
+      imageUrls[(camelCase(source.name) + "Object") as keyof typeof imageUrls],
+      idx
+    );
     const generatedDoor = door(images, player, x, y, side, async () => {
       pauseRender();
+			await showCover();
+      object.start();
       await room({
         images,
         charIndex: (camelCase(source.name) + "Character") as keyof typeof imageUrls,
-        iconUrl:
-          imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
-        bgImage: images[camelCase(source.name) + "Background" as keyof typeof imageUrls],
+        iconUrl: imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
+        bgImage:
+          images[(camelCase(source.name) + "Background") as keyof typeof imageUrls],
         texts: source.textChunks,
         name: source.name,
         charName: source.character,
-        overrides: source.overrides
+        overrides: source.overrides,
+        onCollectObject: () => {
+          const div = document.createElement("div");
+          div.style.position = "fixed";
+          div.style.top = div.style.left = div.style.bottom = div.style.right = "0";
+          div.style.backdropFilter = "blur(10px)";
+          div.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+          div.style.zIndex = (999).toString();
+          object.middle();
+          document.body.appendChild(div);
+
+          const close = () => {
+            window.removeEventListener("keydown", keyListener);
+            div.removeEventListener("click", clickListener);
+            object.end();
+            div.remove();
+          };
+
+          const keyListener = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+              close();
+            }
+          };
+          window.addEventListener("keydown", keyListener);
+          const clickListener = ({ target, currentTarget }: MouseEvent) => {
+            if (target === currentTarget) {
+              close();
+            }
+          };
+          div.addEventListener("click", clickListener);
+        },
       });
       player.v = { x: 0, y: 0 };
       player.x =
@@ -50,7 +88,12 @@ export default (
         (side === "right" ? -1 : 1) *
           (generatedDoor.closedDoor.width / 2 + player.width / 2 + 20);
       restartRender();
-      if (doors[idx + 1] && renderer.objects.findIndex((o) => o._randomId === doors[idx + 1].closedDoor._randomId) !== -1) {
+      if (
+        doors[idx + 1] &&
+        renderer.objects.findIndex(
+          (o) => o._randomId === doors[idx + 1].closedDoor._randomId
+        ) !== -1
+      ) {
         doors[idx + 1].open(renderer);
       }
     });

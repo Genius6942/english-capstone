@@ -1,7 +1,6 @@
 import "./style.css";
 import { ControlledBody, StaticBody, Renderer, loadImages } from "platjs";
 import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
-import { door, room } from "./room";
 import genMap from "./genMap";
 import sources from "./sources";
 
@@ -23,6 +22,7 @@ const playerState = {
 const playerAnimationLength = 10;
 
 export const imageUrls = {
+  // big: "https://i.imgur.com/FX1HVet.png",
   playerLeftStandstill: "/assets/player/player_left_standstill.png",
   playerRightStandstill: "/assets/player/player_right_standstill.png",
   playerLeftWalk1: "/assets/player/player_left_walk_1.png",
@@ -31,23 +31,36 @@ export const imageUrls = {
   playerRightWalk2: "/assets/player/player_right_walk_2.png",
   doorFull: "/assets/door/door_full.png",
   doorUnlockedLeft: "/assets/door/door_unlocked_left.png",
+  doorUnlockedLeftReversed: "/assets/door/door_unlocked_left_reversed.png",
   doorUnlockedRight: "/assets/door/door_unlocked_right.png",
   doorFullReversed: "/assets/door/door_full_reversed.png",
   avatarCharacter: "/assets/characters/avatar_character.png",
   avatarIcon: "/assets/characters/avatar_icon.png",
   avatarBackground: "/assets/backgrounds/avatar.jpg",
-  byTheWatersOfBabylonCharacter:
-    "/assets/characters/byTheWatersOfBabylon_character.png",
+	avatarObject: "/assets/icons/avatar_object.png",
+  byTheWatersOfBabylonCharacter: "/assets/characters/byTheWatersOfBabylon_character.png",
   byTheWatersOfBabylonIcon: "/assets/characters/byTheWatersOfBabylon_icon.png",
-  byTheWatersOfBabylonBackground:
-    "/assets/backgrounds/byTheWatersOfBabylon.jpg",
+  byTheWatersOfBabylonBackground: "/assets/backgrounds/byTheWatersOfBabylon.jpg",
+	byTheWatersOfBabylonObject: "/assets/icons/byTheWatersOfBabylon_object.png",
+  ellenFosterCharacter: "/assets/characters/ellenFoster_character.png",
+  ellenFosterIcon: "/assets/characters/ellenFoster_icon.png",
+	ellenFosterObject: "/assets/icons/ellenFoster_object.png",
+  romeoAndJulietCharacter: "/assets/characters/romeoAndJuliet_character.png",
+  romeoAndJulietIcon: "/assets/characters/romeoAndJuliet_character.png",
+	romeoAndJulietObject: "/assets/icons/romeoAndJuliet_object.png",
+	theHobbitObject: "/assets/icons/theHobbit_object.png",
+	adventuresOfHuckleberryFinnObject: "/assets/icons/adventuresOfHuckleberryFinn_object.png",
 };
+// for (let i = 0; i < 100; i++)
+// // @ts-ignore
+//   imageUrls["big" + i.toString()] = "https://i.imgur.com/FX1HVet.png";
 
 // load images
 loadImages(imageUrls, (loaded, total) => {
-  (document.querySelector("progress") as HTMLProgressElement).value =
+  (document.querySelector("#progress") as HTMLProgressElement).value =
     (loaded / total) * 100;
 }).then((images) => {
+  (document.querySelector("#loading") as HTMLDivElement).style.display = "none";
   const player = new ControlledBody({
     x: 0,
     y: 0,
@@ -56,8 +69,7 @@ loadImages(imageUrls, (loaded, total) => {
     layer: 1,
     color: "blue",
     update: (body) => {
-      playerState.animation =
-        (playerState.animation + 1) % (playerAnimationLength * 2);
+      playerState.animation = (playerState.animation + 1) % (playerAnimationLength * 2);
       if (body.v.x > 0) {
         playerState.dir = 1;
         playerState.moving = true;
@@ -156,6 +168,20 @@ loadImages(imageUrls, (loaded, total) => {
     renderer.camera.pos.x = 0;
     // console.log(renderer.camera.pos.x);
     renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
+
+    // draw range of grey to white background based on camera y
+    const maxHeight = 1500;
+    const minHeight = 0;
+    const minColor = 100;
+    const maxColor = 255;
+    const cameraY =
+      Math.min(maxHeight, Math.max(minHeight, -renderer.camera.pos.y)) - minHeight;
+    const color = Math.floor(
+      (cameraY / (maxHeight - minHeight)) * (maxColor - minColor) + minColor
+    );
+
+    renderer.ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
+    renderer.ctx.fillRect(0, 0, renderer.width, renderer.height);
   });
 
   let pauseRender = false;
@@ -178,6 +204,7 @@ loadImages(imageUrls, (loaded, total) => {
   map.doors.forEach((door) => renderer.beforeRender(door.update));
   map.doors[0].open(renderer);
   map.stairs.forEach((stair) => renderer.add(stair));
+  map.doors[3].open(renderer);
 
   openTypewriter();
   writeTypewriter({
