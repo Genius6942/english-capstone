@@ -3,6 +3,7 @@ import { ControlledBody, StaticBody, Renderer, loadImages } from "platjs";
 import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
 import genMap from "./genMap";
 import sources from "./sources";
+import { doPortal } from "./portal";
 
 // Create a renderer
 // This handles physics and rendering for you.
@@ -37,22 +38,43 @@ export const imageUrls = {
   avatarCharacter: "/assets/characters/avatar_character.png",
   avatarIcon: "/assets/characters/avatar_icon.png",
   avatarBackground: "/assets/backgrounds/avatar.jpg",
-	avatarObject: "/assets/icons/avatar_object.png",
-	avatarImage: "/assets/images/avatar.png",
+  avatarObject: "/assets/icons/avatar_object.png",
+  avatarImage: "/assets/images/avatar.png",
+  avatarBook: "/assets/books/avatar.jpeg",
   byTheWatersOfBabylonCharacter: "/assets/characters/byTheWatersOfBabylon_character.png",
   byTheWatersOfBabylonIcon: "/assets/characters/byTheWatersOfBabylon_icon.png",
   byTheWatersOfBabylonBackground: "/assets/backgrounds/byTheWatersOfBabylon.jpg",
-	byTheWatersOfBabylonObject: "/assets/icons/byTheWatersOfBabylon_object.png",
-	byTheWatersOfBabylonImage: "/assets/images/byTheWatersOfBabylon.png",
+  byTheWatersOfBabylonObject: "/assets/icons/byTheWatersOfBabylon_object.png",
+  byTheWatersOfBabylonImage: "/assets/images/byTheWatersOfBabylon.png",
+  byTheWatersOfBabylonBook: "/assets/books/byTheWatersOfBabylon.jpg",
   ellenFosterCharacter: "/assets/characters/ellenFoster_character.png",
   ellenFosterIcon: "/assets/characters/ellenFoster_icon.png",
-	ellenFosterObject: "/assets/icons/ellenFoster_object.png",
+  ellenFosterObject: "/assets/icons/ellenFoster_object.png",
+  ellenFosterImage: "/assets/images/ellenFoster.jpg",
+  ellenFosterBook: "/assets/books/ellenFoster.jpg",
   romeoAndJulietCharacter: "/assets/characters/romeoAndJuliet_character.png",
   romeoAndJulietIcon: "/assets/characters/romeoAndJuliet_character.png",
-	romeoAndJulietObject: "/assets/icons/romeoAndJuliet_object.png",
-	theHobbitObject: "/assets/icons/theHobbit_object.png",
-	adventuresOfHuckleberryFinnObject: "/assets/icons/adventuresOfHuckleberryFinn_object.png",
+  romeoAndJulietObject: "/assets/icons/romeoAndJuliet_object.png",
+  romeoAndJulietImage: "/assets/images/romeoAndJuliet.png",
+  romeoAndJulietBook: "/assets/books/romeoAndJuliet.jpg",
+  theHobbitCharacter: "/assets/characters/theHobbit_character.png",
+  theHobbitIcon: "/assets/characters/theHobbit_character.png",
+  theHobbitObject: "/assets/icons/theHobbit_object.png",
+  theHobbitImage: "/assets/images/theHobbit.png",
+  theHobbitBook: "/assets/books/theHobbit.jpg",
+  adventuresOfHuckleberryFinnCharacter:
+    "/assets/characters/adventuresOfHuckleberryFinn_character.png",
+  adventuresOfHuckleberryFinnIcon:
+    "/assets/characters/adventuresOfHuckleberryFinn_character.png",
+  adventuresOfHuckleberryFinnObject:
+    "/assets/icons/adventuresOfHuckleberryFinn_object.png",
+  adventuresOfHuckleberryFinntImage: "/assets/images/adventuresOfHuckleberryFinn.png",
+  adventuresOfHuckleberryFinnBook: "/assets/books/adventuresOfHuckleberryFinn.jpg",
 
+  portal1: "/assets/portal/door/1.webp",
+  portal2: "/assets/portal/door/2.webp",
+  portal3: "/assets/portal/door/3.webp",
+  portal4: "/assets/portal/door/4.webp",
 };
 // for (let i = 0; i < 100; i++)
 // // @ts-ignore
@@ -69,7 +91,7 @@ loadImages(imageUrls, (loaded, total) => {
     y: 0,
     width: 30,
     height: 90,
-    layer: 1,
+    layer: 2,
     color: "blue",
     update: (body) => {
       playerState.animation = (playerState.animation + 1) % (playerAnimationLength * 2);
@@ -169,7 +191,6 @@ loadImages(imageUrls, (loaded, total) => {
 
   renderer.beforeRender(() => {
     renderer.camera.pos.x = 0;
-    // console.log(renderer.camera.pos.x);
     renderer.camera.pos.y = Math.min(0, renderer.camera.pos.y);
 
     // draw range of grey to white background based on camera y
@@ -207,12 +228,25 @@ loadImages(imageUrls, (loaded, total) => {
   map.doors.forEach((door) => renderer.beforeRender(door.update));
   map.doors[0].open(renderer);
   map.stairs.forEach((stair) => renderer.add(stair));
-  map.doors[3].open(renderer);
+
+  const portal = map.portal;
+  renderer.add(portal.object);
 
   openTypewriter();
   writeTypewriter({
-    text: "Hi mom! i love you lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. yay",
-  }).then(closeTypewriter);
+    text: "Welcome to my english capstone project! This year, my essential question was: How do stories involving important decisions help us define who we are as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
+  })
+    .then(() =>
+      writeTypewriter({
+        text: "After answering the question, I chose to make a game to guide the player to the answer, because I thought it would explain the answer well and would be interactive and engaging. In this game, you will navigate through different rooms of a tower. In each room, the main character from each source will explain their story and how it connects to the essential question. Each room also has a image I made that represents the source and the theme it portrays.",
+      })
+    )
+    .then(() =>
+      writeTypewriter({
+        text: "To get started, us the WASD or arrow keys to navigate! The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build to the final answer at the end. Have fun!",
+      })
+    )
+    .then(closeTypewriter);
   // rendering loop
   const animationLoop = () => {
     if (pauseRender) return;
@@ -227,6 +261,19 @@ loadImages(imageUrls, (loaded, total) => {
       player.v.x = 0;
       player.x = 30;
       player.y = 30;
+    }
+
+    portal.update(portal.object, player);
+    if (portal.object.collides(player)) {
+      pauseRender = true;
+      doPortal(
+        map.keys,
+        images,
+        () => {
+          pauseRender = true;
+        },
+        restartRender
+      );
     }
 
     // draw everything

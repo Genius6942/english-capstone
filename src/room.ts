@@ -7,7 +7,7 @@ export const door = (
     doorFull: HTMLImageElement;
     doorFullReversed: HTMLImageElement;
     doorUnlockedLeft: HTMLImageElement;
-		doorUnlockedLeftReversed: HTMLImageElement;
+    doorUnlockedLeftReversed: HTMLImageElement;
     doorUnlockedRight: HTMLImageElement;
   },
   player: ControlledBody,
@@ -32,7 +32,7 @@ export const door = (
     y: y,
     width: side === "left" ? width / 2 : -width / 2,
     height: height,
-    layer: 2,
+    layer: 3,
     image: images.doorUnlockedRight,
   });
 
@@ -89,7 +89,7 @@ export const door = (
 };
 
 // type T is imported images from main.ts
-type Images = {
+export type Images = {
   [k in keyof Awaited<typeof import("./main")>["imageUrls"]]: HTMLImageElement;
 };
 
@@ -166,8 +166,7 @@ function drawImageProp(
   // @ts-ignore
   ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
 }
-
-export const room = ({
+export function room({
   images,
   charIndex,
   iconUrl,
@@ -175,21 +174,23 @@ export const room = ({
   bgImage,
   texts,
   name,
+  end = false,
   charName,
-	onCollectObject,
+  onCollectObject,
   overrides = {},
 }: {
+  end?: boolean;
   images: Images;
   charIndex: keyof Images;
   iconUrl: string;
   bgImage: HTMLImageElement;
-  name: string;
+  name?: string;
   charName: string;
   texts: string[];
-	onCollectObject: () => void;
+  onCollectObject?: () => void;
   overrides?: Partial<{ charHeight: number }>;
-}) =>
-  new Promise<void>(async (resolve) => {
+}) {
+  return new Promise<void>(async (resolve) => {
     try {
       const renderer = new Renderer()
         .mount(document.body)
@@ -288,7 +289,7 @@ export const room = ({
         new StaticBody({
           x: -window.innerWidth / 2,
           y: -doorGapHeight,
-          height: window.innerHeight - doorGapHeight,
+          height: end ? 10 ** 6 : window.innerHeight - doorGapHeight,
           width: 100,
           color: "black",
           layer: 1,
@@ -346,7 +347,7 @@ export const room = ({
             await writeTypewriter({ text });
           }
           closeTypewriter();
-					onCollectObject();
+          !end && onCollectObject && onCollectObject();
           speaking = false;
           spoken = true;
 
@@ -368,9 +369,8 @@ export const room = ({
               "hidden"
             );
             (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
-              "Press space to interact with " + charName + " from " + name;
+              "Press space to interact with " + charName + (end ? "" : " from " + name);
             window.addEventListener("keydown", speakingListener);
-            console.log("toggle on");
             withinRange = true;
           } else {
             (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
@@ -379,7 +379,6 @@ export const room = ({
             (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
               "Press space to interact";
             window.removeEventListener("keydown", speakingListener);
-            console.log("toggle off");
             withinRange = false;
           }
         }
@@ -427,3 +426,4 @@ export const room = ({
       console.error(e);
     }
   });
+}

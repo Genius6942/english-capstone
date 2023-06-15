@@ -18,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       try {
+        if (localStorage.getItem("dev-mode") !== 1) throw new Error("no dev mode");
         eruda.init({
           defaults: {
             displaySize: 30,
@@ -40,12 +41,12 @@
           }
         });
       } catch (e) {
-        alert(e);
+        // alert(e);
       }
     </script>
     <div
       id="typewriter"
-      class="fixed w-screen bottom-0 z-50 p-5 backdrop-blur-xs bg-[rgba(255,255,255,.3)] hidden"
+      class="fixed w-screen bottom-0 z-[1002] p-5 backdrop-blur-xl bg-[rgba(255,255,255,.3)] hidden"
     >
       <div class="rounded-3xl border-yellow-700 border-8 p-5 bg-white flex">
         <div class="w-full relative mr-3">
@@ -64,7 +65,7 @@
     </div>
     <div
       id="caninteract"
-      class="hidden fixed bottom-3 left-1/2 opacity-100 -translate-x-1/2 rounded-full p-3 border-4 border-black bg-white z-[99] transition-all select-none pointer-events-none"
+      class="hidden fixed bottom-3 left-1/2 opacity-100 -translate-x-1/2 rounded-full p-3 border-4 border-black bg-white z-[1001] transition-all select-none pointer-events-none"
     >
       Space to interact
     </div>

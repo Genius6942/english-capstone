@@ -1,8 +1,9 @@
 import { door, room } from "./room";
 import { imageUrls } from "./main";
 import { StaticBody } from "platjs";
-import { createObject } from "./objects";
+import { createObject, createObjectBg } from "./objects";
 import { showCover } from "./fade";
+import { portal as createPortal } from "./portal";
 
 export default (
   sources: typeof import("./sources").default,
@@ -14,7 +15,7 @@ export default (
   restartRender: () => void,
   renderer: import("platjs").Renderer
 ) => {
-  const yGap = 200;
+  const yGap = 250;
 
   const stairs: StaticBody[] = [];
   const camelCase = (str: string) => {
@@ -24,6 +25,9 @@ export default (
       })
       .replace(/\s+/g, "");
   };
+  const keys: ReturnType<typeof createObject>[] = [];
+
+  createObjectBg(sources.length);
 
   const doors = sources.map((source, idx) => {
     const side = idx % 2 === 0 ? "right" : "left";
@@ -35,8 +39,10 @@ export default (
 
     const object = createObject(
       imageUrls[(camelCase(source.name) + "Object") as keyof typeof imageUrls],
-      idx
+      idx,
+      sources.length
     );
+    keys.push(object);
     const generatedDoor = door(images, player, x, y, side, async () => {
       pauseRender();
       await showCover();
@@ -44,7 +50,7 @@ export default (
       await room({
         images,
         charIndex: (camelCase(source.name) + "Character") as keyof typeof imageUrls,
-        iconUrl: imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
+        iconUrl: imageUrls[(camelCase(source.name) + "Book") as keyof typeof imageUrls],
         bgImage:
           images[(camelCase(source.name) + "Background") as keyof typeof imageUrls],
         texts: source.textChunks,
@@ -54,20 +60,32 @@ export default (
         onCollectObject: () => {
           const div = document.createElement("div");
           div.className =
-            "fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center";
+            "fixed top-0 left-0 right-0 bottom-0 flex flex-col justify-center items-center";
           div.style.backdropFilter = "blur(10px)";
           div.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
           div.style.opacity = "0";
           div.style.transition = "opacity 0.5s";
           div.style.opacity = "1";
-          div.style.zIndex = (999).toString();
+          div.style.zIndex = (10000).toString();
           object.middle();
           document.body.appendChild(div);
-					
+
           const image = document.createElement("img");
+          image.style.cssText = "transition: all .2s ease";
           image.src =
             imageUrls[(camelCase(source.name) + "Image") as keyof typeof imageUrls];
           div.appendChild(image);
+          const description = document.createElement("div");
+          description.className =
+            "text-white text-xl mt-4 mx-[200px] text-center text-xl font-bold rounded-xl bg-[rgba(0,0,0,0.5)], px-4 py-2 backdrop-blur-2xl";
+          description.innerText = source.imageExplination;
+          div.appendChild(description);
+          image.style.maxHeight =
+            (window.innerHeight - description.offsetHeight - 100).toString() + "px";
+          const btn = document.createElement("button");
+          btn.className = "w-0 h-0 focus-visible:outline-none";
+          div.appendChild(btn);
+          btn.focus();
 
           const close = () => {
             window.removeEventListener("keydown", keyListener);
@@ -81,11 +99,14 @@ export default (
           };
 
           const keyListener = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
+            if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              e.stopPropagation();
               close();
             }
           };
-          window.addEventListener("keydown", keyListener);
+          setTimeout(() => btn.addEventListener("keydown", keyListener), 0);
           const clickListener = close;
           div.addEventListener("click", clickListener);
         },
@@ -109,7 +130,7 @@ export default (
     const stairYGap = 60;
     const stairXGap = 20;
     const totalStairWidth = window.innerWidth - 100 * 2 - 50 * 2 - stairXGap;
-    const totalYGap = yGap + 150 - stairYGap;
+    const totalYGap = yGap + 150 - stairYGap - 50;
     const stairsNeeded = Math.ceil(totalYGap / stairYGap);
     const stairWidth = totalStairWidth / stairsNeeded - stairXGap;
     const stairHeight = 15;
@@ -144,9 +165,20 @@ export default (
     return acc;
   }, [] as import("platjs").GameObject[]);
 
+  const portal = createPortal({
+    x: (sources.length % 2 === 0 ? 1 : -1) * (window.innerWidth / 2 - 50 - 50),
+    y: window.innerHeight / 2 - 50 - (yGap + 150) * sources.length,
+		// x: 0,
+		// y: 0,
+    images,
+    objectOptions: { layer: 1 },
+  });
+
   return {
     objects,
+    keys,
     doors,
     stairs,
+    portal,
   };
 };

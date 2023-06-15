@@ -1,4 +1,5 @@
 const fadeElement = document.querySelector("#fade") as HTMLDivElement;
+
 export const showCover = async ({ duration = 0.7, asyncrounous = true } = {}) => {
   fadeElement.style.transition = `all ${duration}s ease-in-out`;
   fadeElement.style.opacity = "1";
