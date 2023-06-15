@@ -120,7 +120,7 @@ export const doPortal = async (
           .slice(0, sources.length - 1)
           .map((source) => source.name)
           .join(", ") +
-        ", and Adventures of Huckleberry Finn is that they all show the importance of pushing past cultural boundaries with our own decisions. They help the readers understand how rather than succumbign to societal norms, we should always do what is best for us and the people around us. Each stories presented in this game points towards one part of culture where this can occur, whether it be individually, in your community, or in the world.",
+        ", and Adventures of Huckleberry Finn is that they all show the importance of pushing past cultural boundaries with our own decisions. They help the readers understand how rather than succumbing to societal norms, we should always do what is best for us and the people around us. Each stories presented in this game points towards one part of culture where this can occur, whether it be individually, in your community, or in the world.",
       "I hope you enjoyed this game and were able to learn something new about stories from it! Thank you for playing!",
     ],
     charName: "the creator",
