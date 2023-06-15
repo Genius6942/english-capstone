@@ -81,7 +81,7 @@ export const door = (
         player.y - Math.abs(player.height) / 2 >= outer.y - Math.abs(outer.height) / 2 &&
         player.y + Math.abs(player.height) / 2 <= outer.y + Math.abs(outer.height) / 2
       ) {
-        activated = true;
+        // activated = true;
         onActivate();
       }
     },
