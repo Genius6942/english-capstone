@@ -234,7 +234,7 @@ loadImages(imageUrls, (loaded, total) => {
 
   openTypewriter();
   writeTypewriter({
-    text: "Welcome to my english capstone project! This year, my essential question was: How do stories involving important decisions help us define who we are as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
+    text: "Welcome to my english capstone project! This year, my essential question was: How do stories involving important decisions help us define who we should make our choices as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
   })
     .then(() =>
       writeTypewriter({
