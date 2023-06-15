@@ -16,7 +16,7 @@ export const door = (
   side: "left" | "right",
   onActivate: (() => void) | (() => Promise<void>)
 ) => {
-  let activated = false;
+  // let activated = false;
   const width = 100,
     height = 150;
   const inner = new GameObject({
