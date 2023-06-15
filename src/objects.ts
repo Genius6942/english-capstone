@@ -53,16 +53,19 @@ export const createObject = (imgUrl: string, index: number) => {
       resize(locations.start.size);
       moveTo(locations.start.x, locations.start.y);
       show();
+			obj.style.opacity = "1";
       await new Promise((resolve) => setTimeout(resolve, transitionMs));
     },
     middle: async () => {
       resize(locations.middle.size);
       moveTo(locations.middle.x, locations.middle.y);
+			obj.style.opacity = "0";
       await new Promise((resolve) => setTimeout(resolve, transitionMs));
     },
     end: async () => {
       resize(locations.end.size);
       moveTo(locations.end.x, locations.end.y);
+			obj.style.opacity = "1";
       await new Promise((resolve) => setTimeout(resolve, transitionMs));
     },
   };

@@ -30,8 +30,7 @@ export default (
     const doorWallMargin = 0;
 
     const x =
-      (window.innerWidth / 2 - 50 - 50 - doorWallMargin) *
-      (side === "left" ? -1 : 1);
+      (window.innerWidth / 2 - 50 - 50 - doorWallMargin) * (side === "left" ? -1 : 1);
     const y = window.innerHeight / 2 - 50 - 75 - (yGap + 150) * idx;
 
     const object = createObject(
@@ -44,40 +43,41 @@ export default (
       object.start();
       await room({
         images,
-        charIndex: (camelCase(source.name) +
-          "Character") as keyof typeof imageUrls,
-        iconUrl:
-          imageUrls[
-            (camelCase(source.name) + "Icon") as keyof typeof imageUrls
-          ],
+        charIndex: (camelCase(source.name) + "Character") as keyof typeof imageUrls,
+        iconUrl: imageUrls[(camelCase(source.name) + "Icon") as keyof typeof imageUrls],
         bgImage:
-          images[
-            (camelCase(source.name) + "Background") as keyof typeof imageUrls
-          ],
+          images[(camelCase(source.name) + "Background") as keyof typeof imageUrls],
         texts: source.textChunks,
         name: source.name,
         charName: source.character,
         overrides: source.overrides,
         onCollectObject: () => {
           const div = document.createElement("div");
-          div.style.position = "fixed";
-          div.style.top =
-            div.style.left =
-            div.style.bottom =
-            div.style.right =
-              "0";
+          div.className =
+            "fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center";
           div.style.backdropFilter = "blur(10px)";
           div.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+          div.style.opacity = "0";
+          div.style.transition = "opacity 0.5s";
+          div.style.opacity = "1";
           div.style.zIndex = (999).toString();
           object.middle();
           document.body.appendChild(div);
+					
+          const image = document.createElement("img");
+          image.src =
+            imageUrls[(camelCase(source.name) + "Image") as keyof typeof imageUrls];
+          div.appendChild(image);
 
           const close = () => {
             window.removeEventListener("keydown", keyListener);
             div.removeEventListener("click", clickListener);
             object.end();
-            div.remove();
-            div.style.display = "none";
+            div.style.opacity = "0";
+            setTimeout(() => {
+              div.remove();
+              div.style.display = "none";
+            }, 500);
           };
 
           const keyListener = (e: KeyboardEvent) => {
@@ -113,26 +113,24 @@ export default (
     const stairsNeeded = Math.ceil(totalYGap / stairYGap);
     const stairWidth = totalStairWidth / stairsNeeded - stairXGap;
     const stairHeight = 15;
-    const generatedStairs = Array.from({ length: stairsNeeded }).map(
-      (_, idx) => {
-        const stair = new StaticBody({
-          x:
-            x +
-            (side === "right" ? -1 : 1) *
-              (doorWallMargin +
-                50 +
-                100 +
-                stairXGap / 2 +
-                stairWidth / 2 +
-                (stairWidth + stairXGap) * idx),
-          y: y + 50 - (stairYGap / 2 + stairHeight / 2) - idx * stairYGap,
-          width: stairWidth,
-          height: stairHeight,
-          color: "black",
-        });
-        return stair;
-      }
-    );
+    const generatedStairs = Array.from({ length: stairsNeeded }).map((_, idx) => {
+      const stair = new StaticBody({
+        x:
+          x +
+          (side === "right" ? -1 : 1) *
+            (doorWallMargin +
+              50 +
+              100 +
+              stairXGap / 2 +
+              stairWidth / 2 +
+              (stairWidth + stairXGap) * idx),
+        y: y + 50 - (stairYGap / 2 + stairHeight / 2) - idx * stairYGap,
+        width: stairWidth,
+        height: stairHeight,
+        color: "black",
+      });
+      return stair;
+    });
 
     stairs.push(...generatedStairs);
 

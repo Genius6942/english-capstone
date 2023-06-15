@@ -38,10 +38,12 @@ export const imageUrls = {
   avatarIcon: "/assets/characters/avatar_icon.png",
   avatarBackground: "/assets/backgrounds/avatar.jpg",
 	avatarObject: "/assets/icons/avatar_object.png",
+	avatarImage: "/assets/images/avatar.png",
   byTheWatersOfBabylonCharacter: "/assets/characters/byTheWatersOfBabylon_character.png",
   byTheWatersOfBabylonIcon: "/assets/characters/byTheWatersOfBabylon_icon.png",
   byTheWatersOfBabylonBackground: "/assets/backgrounds/byTheWatersOfBabylon.jpg",
 	byTheWatersOfBabylonObject: "/assets/icons/byTheWatersOfBabylon_object.png",
+	byTheWatersOfBabylonImage: "/assets/images/byTheWatersOfBabylon.png",
   ellenFosterCharacter: "/assets/characters/ellenFoster_character.png",
   ellenFosterIcon: "/assets/characters/ellenFoster_icon.png",
 	ellenFosterObject: "/assets/icons/ellenFoster_object.png",
@@ -50,6 +52,7 @@ export const imageUrls = {
 	romeoAndJulietObject: "/assets/icons/romeoAndJuliet_object.png",
 	theHobbitObject: "/assets/icons/theHobbit_object.png",
 	adventuresOfHuckleberryFinnObject: "/assets/icons/adventuresOfHuckleberryFinn_object.png",
+
 };
 // for (let i = 0; i < 100; i++)
 // // @ts-ignore
