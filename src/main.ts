@@ -234,7 +234,7 @@ loadImages(imageUrls, (loaded, total) => {
 
   openTypewriter();
   writeTypewriter({
-    text: "Welcome to my english capstone project! This year, my essential question was: How do stories involving important decisions help us define who we should make our choices as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
+    text: "Welcome to my English Capstone project! This year, my essential question was: How do stories involving important decisions help us define how we should make our choices as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
   })
     .then(() =>
       writeTypewriter({
@@ -243,7 +243,7 @@ loadImages(imageUrls, (loaded, total) => {
     )
     .then(() =>
       writeTypewriter({
-        text: "To get started, us the WASD or arrow keys to navigate! The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build to the final answer at the end. Have fun!",
+        text: "To get started, us the WASD or arrow keys to navigate! The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build toward the final answer at the end. Have fun!",
       })
     )
     .then(closeTypewriter);
