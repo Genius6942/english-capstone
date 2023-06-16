@@ -5,6 +5,7 @@ import { createObject, createObjectBg } from "./objects";
 import { showCover } from "./fade";
 import { portal as createPortal } from "./portal";
 import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
+import updateInstructions from "./instructions";
 
 export default (
   sources: typeof import("./sources").default,
@@ -128,13 +129,22 @@ export default (
         doors[idx + 1].open(renderer);
       }
 
-			if (idx === 0) {
-				await openTypewriter();
-				await writeTypewriter({
-					text: 'To continue, go up the stairs on the left and continue to the next floor, which has been unlocked. After that, keep going up to the end!'
-				});
-				await closeTypewriter();
-			}
+      updateInstructions(
+        `Move ${
+          side === "right" ? "left" : "right"
+        } and jump to climb the stairs and reach the next room, which should be unlocked. Having trouble? Simply hold the ${
+          side === "right" ? "left" : "right"
+        } arrow key and press space to jump when you hit a wall.`
+      );
+      generatedDoor.doorFloor.width += 100;
+
+      if (idx === 0) {
+        await openTypewriter();
+        await writeTypewriter({
+          text: "To continue, go up the stairs on the left and continue to the next floor, which has been unlocked. After that, keep going up to the end!",
+        });
+        await closeTypewriter();
+      }
     });
 
     const stairYGap = 60;

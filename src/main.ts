@@ -4,6 +4,7 @@ import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
 import genMap from "./genMap";
 import sources from "./sources";
 import { doPortal } from "./portal";
+import updateInstructions from "./instructions";
 
 // Create a renderer
 // This handles physics and rendering for you.
@@ -272,6 +273,10 @@ loadImages(imageUrls, (loaded, total) => {
     document.addEventListener("keydown", keydownHandler);
   }
 
+  updateInstructions(
+    "Press space to interact with a character, or to continue the dialogue. Use the right arrow to move right, the left arrow to move left, and the up arrow to jump up. Muitple keys can be pressed at the same time to jump and move."
+  );
+
   detectKonamiCode(async () => {
     if (!portalAdded) {
       portalAdded = true;
@@ -287,6 +292,7 @@ loadImages(imageUrls, (loaded, total) => {
         await key.middle();
         await key.end();
       });
+      map.doors.forEach((door) => door.open(renderer));
     }
   });
 
@@ -301,12 +307,13 @@ loadImages(imageUrls, (loaded, total) => {
     )
     .then(() =>
       writeTypewriter({
-        text: "To get started, us the WASD or arrow keys to navigate! The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build toward the final answer at the end. Have fun!",
+        text: "To get started, us the WASD or arrow keys to navigate! If you hare having trouble, there are intructions on the top left to guide you throught the experience. The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build toward the final answer at the end. Have fun!",
       })
     )
     .then(() => {
       closeTypewriter();
       (document.querySelector("#pointer") as HTMLElement).style.display = "block";
+      updateInstructions("Use the right arrow to move to the right into the door.");
     });
   // rendering loop
   const animationLoop = () => {

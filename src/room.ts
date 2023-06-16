@@ -1,6 +1,7 @@
 import { ControlledBody, GameObject, Renderer, StaticBody } from "platjs";
 import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
 import { hideCover, showCover } from "./fade";
+import updateInstructions from "./instructions";
 
 export const door = (
   images: {
@@ -348,12 +349,17 @@ export function room({
           }
           closeTypewriter();
           !end && onCollectObject && onCollectObject();
+          if (!end) {
+            updateInstructions("Hold the left key to walk left and exit the room.");
+          }
           speaking = false;
           spoken = true;
 
           // renderer.destroy(door);
         }
       };
+
+      updateInstructions("Hold the right arrow key to walk over to the character.");
 
       let withinRange = false;
       const requiredRange = 20;
@@ -371,6 +377,7 @@ export function room({
             (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
               "Press space to interact with " + charName + (end ? "" : " from " + name);
             window.addEventListener("keydown", speakingListener);
+            !spoken && updateInstructions("Press space to interact with the character.");
             withinRange = true;
           } else {
             (document.querySelector("#caninteract") as HTMLDivElement).classList.add(
@@ -379,6 +386,10 @@ export function room({
             (document.querySelector("#caninteract") as HTMLDivElement).innerHTML =
               "Press space to interact";
             window.removeEventListener("keydown", speakingListener);
+            !spoken &&
+              updateInstructions(
+                "Hold the right arrow key to walk over to the character."
+              );
             withinRange = false;
           }
         }
