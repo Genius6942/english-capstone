@@ -211,8 +211,9 @@ loadImages(imageUrls, (loaded, total) => {
   let pauseRender = false;
   const restartRender = () => {
     pauseRender = false;
-		(document.querySelector("#pointer") as HTMLDivElement).remove();
-		
+    const pointer = document.querySelector("#pointer");
+    if (pointer) pointer.remove();
+
     requestAnimationFrame(animationLoop);
   };
 
@@ -232,7 +233,13 @@ loadImages(imageUrls, (loaded, total) => {
   map.stairs.forEach((stair) => renderer.add(stair));
 
   const portal = map.portal;
-  renderer.add(portal.object);
+  let portalAdded = false;
+
+  if (window.innerWidth < 1200) {
+    alert(
+      "Your screen is too small! Switch to a larger device, or try zooming out with ctrl -"
+    );
+  }
 
   openTypewriter();
   writeTypewriter({
@@ -249,9 +256,9 @@ loadImages(imageUrls, (loaded, total) => {
       })
     )
     .then(() => {
-			closeTypewriter();
-			(document.querySelector('#pointer') as HTMLElement).style.display = 'block';
-		});
+      closeTypewriter();
+      (document.querySelector("#pointer") as HTMLElement).style.display = "block";
+    });
   // rendering loop
   const animationLoop = () => {
     if (pauseRender) return;
@@ -268,17 +275,24 @@ loadImages(imageUrls, (loaded, total) => {
       player.y = 30;
     }
 
-    portal.update(portal.object, player);
-    if (portal.object.collides(player)) {
-      pauseRender = true;
-      doPortal(
-        map.keys,
-        images,
-        () => {
-          pauseRender = true;
-        },
-        restartRender
-      );
+    if (portalAdded) {
+      portal.update(portal.object, player);
+      if (portal.object.collides(player)) {
+        pauseRender = true;
+        doPortal(
+          map.keys,
+          images,
+          () => {
+            pauseRender = true;
+          },
+          restartRender
+        );
+      }
+    } else {
+      if (map.keys.filter((key) => !key.isCollected()).length === 0) {
+        portalAdded = true;
+        renderer.add(portal.object);
+      }
     }
 
     // draw everything

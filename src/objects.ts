@@ -56,8 +56,9 @@ export const createObject = (imgUrl: string, index: number, total: number) => {
 			size: 0,
 		}
   };
-
+	let collected = false;
   return {
+		isCollected: () => collected,
     start: async () => {
       resize(locations.start.size);
       moveTo(locations.start.x, locations.start.y);
@@ -75,6 +76,7 @@ export const createObject = (imgUrl: string, index: number, total: number) => {
       resize(locations.end.size);
       moveTo(locations.end.x, locations.end.y);
       obj.style.opacity = "1";
+			collected = true;
       // obj.style.padding = "5px 10px";
       // if (index === 0) {
       // 	obj.style.borderTopLeftRadius = obj.style.borderBottomLeftRadius = "9999px";
