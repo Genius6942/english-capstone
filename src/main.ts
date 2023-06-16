@@ -241,6 +241,55 @@ loadImages(imageUrls, (loaded, total) => {
     );
   }
 
+  function detectKonamiCode(callback: () => void) {
+    const konamiCode = [
+      "ArrowUp",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowLeft",
+      "ArrowRight",
+      "KeyB",
+      "KeyA",
+      "Enter",
+    ];
+    let index = 0;
+
+    function keydownHandler(event: KeyboardEvent) {
+      if (event.code === konamiCode[index]) {
+        index++;
+        if (index === konamiCode.length) {
+          callback();
+          index = 0;
+        }
+      } else {
+        index = 0;
+      }
+    }
+
+    document.addEventListener("keydown", keydownHandler);
+  }
+
+  detectKonamiCode(async () => {
+    if (!portalAdded) {
+      portalAdded = true;
+      renderer.add(portal.object);
+      openTypewriter();
+      await writeTypewriter({
+        text: "why are you hecker just play normaly plz",
+      });
+      closeTypewriter();
+      (document.querySelector("#object-bg") as HTMLDivElement).style.opacity = "1";
+      map.keys.forEach(async (key) => {
+        await key.start();
+        await key.middle();
+        await key.end();
+      });
+    }
+  });
+
   openTypewriter();
   writeTypewriter({
     text: "Welcome to my English Capstone project! This year, my essential question was: How do stories involving important decisions help us define how we should make our choices as individuals? To answer this question, I read/watched 12 different media sources, and then compiled them all into a single answer, drawing connections from 6 of them that I carefully selected.",
