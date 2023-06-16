@@ -4,6 +4,7 @@ import { StaticBody } from "platjs";
 import { createObject, createObjectBg } from "./objects";
 import { showCover } from "./fade";
 import { portal as createPortal } from "./portal";
+import { closeTypewriter, openTypewriter, writeTypewriter } from "./typewriter";
 
 export default (
   sources: typeof import("./sources").default,
@@ -126,6 +127,14 @@ export default (
       ) {
         doors[idx + 1].open(renderer);
       }
+
+			if (idx === 0) {
+				await openTypewriter();
+				await writeTypewriter({
+					text: 'To continue, go up the stairs on the left and continue to the next floor, which has been unlocked. After that, keep going up to the end!'
+				});
+				await closeTypewriter();
+			}
     });
 
     const stairYGap = 60;
