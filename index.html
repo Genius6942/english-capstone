@@ -100,7 +100,25 @@
         animation: MoveUpDown 1s ease infinite;
       }
     </style>
-		<div id="instructions" class="font-bold fixed top-0 left-0 p-3 w-72 bg-[rgba(255,255,255,0.6)] backdrop-blur-xl rounded-br-2xl z-[987]"></div>
+    <div
+      id="instructions-container"
+      class="font-bold fixed top-0 left-0 p-3 w-72 bg-[rgba(255,255,255,0.6)] backdrop-blur-xl rounded-br-2xl z-[987]"
+    >
+      <div class="relative">
+        <div id="instructions"></div>
+        <div
+          class="absolute bottom-0 right-0 w-4 h-4 cursor-pointer"
+          style="
+            /* background-image: url(https://w7.pngwing.com/pngs/211/405/png-transparent-computer-icons-close-button-trademark-logo-sign.png); */
+            object-fit: cover;
+            background-position: center;
+          "
+					onclick="document.getElementById('instructions-container').classList.add('hidden');"
+        >
+          x
+        </div>
+      </div>
+    </div>
     <img
       src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Red_Arrow_Down.svg/1200px-Red_Arrow_Down.svg.png"
       class="fixed bottom-[230px] right-[65px] h-[100px] z-10 hidden"

@@ -351,7 +351,9 @@ export function room({
           !end && onCollectObject && onCollectObject();
           if (!end) {
             updateInstructions("Hold the left key to walk left and exit the room.");
-          }
+          } else {
+						updateInstructions("Game over. Well done!")
+					}
           speaking = false;
           spoken = true;
 

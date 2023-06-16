@@ -69,7 +69,7 @@ export const imageUrls = {
     "/assets/characters/adventuresOfHuckleberryFinn_character.png",
   adventuresOfHuckleberryFinnObject:
     "/assets/icons/adventuresOfHuckleberryFinn_object.png",
-  adventuresOfHuckleberryFinntImage: "/assets/images/adventuresOfHuckleberryFinn.png",
+  adventuresOfHuckleberryFinnImage: "/assets/images/adventuresOfHuckleberryFinn.png",
   adventuresOfHuckleberryFinnBook: "/assets/books/adventuresOfHuckleberryFinn.jpg",
 
   portal1: "/assets/portal/door/1.webp",

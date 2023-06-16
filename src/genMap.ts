@@ -134,7 +134,7 @@ export default (
           side === "right" ? "left" : "right"
         } and jump to climb the stairs and reach the next room, which should be unlocked. Having trouble? Simply hold the ${
           side === "right" ? "left" : "right"
-        } arrow key and press space to jump when you hit a wall.`
+        } arrow key and press the up arrow key to jump when you hit a wall.`
       );
       generatedDoor.doorFloor.width += 100;
 
