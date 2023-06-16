@@ -90,6 +90,7 @@ export default (
           const close = () => {
             window.removeEventListener("keydown", keyListener);
             div.removeEventListener("click", clickListener);
+            (document.querySelector("#object-bg") as HTMLDivElement).style.opacity = "1";
             object.end();
             div.style.opacity = "0";
             setTimeout(() => {
@@ -168,8 +169,8 @@ export default (
   const portal = createPortal({
     x: (sources.length % 2 === 0 ? 1 : -1) * (window.innerWidth / 2 - 50 - 50),
     y: window.innerHeight / 2 - 50 - (yGap + 150) * sources.length,
-		// x: 0,
-		// y: 0,
+    // x: 0,
+    // y: 0,
     images,
     objectOptions: { layer: 1 },
   });

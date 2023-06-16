@@ -87,7 +87,7 @@ loadImages(imageUrls, (loaded, total) => {
 }).then((images) => {
   (document.querySelector("#loading") as HTMLDivElement).style.display = "none";
   const player = new ControlledBody({
-    x: 0,
+    x: window.innerWidth / 2 - 30 - 50 - 150,
     y: 0,
     width: 30,
     height: 90,
@@ -211,6 +211,8 @@ loadImages(imageUrls, (loaded, total) => {
   let pauseRender = false;
   const restartRender = () => {
     pauseRender = false;
+		(document.querySelector("#pointer") as HTMLDivElement).remove();
+		
     requestAnimationFrame(animationLoop);
   };
 
@@ -246,7 +248,10 @@ loadImages(imageUrls, (loaded, total) => {
         text: "To get started, us the WASD or arrow keys to navigate! The start is on the right, and after that, continue up the tower. Each room unlocks the next, and all build toward the final answer at the end. Have fun!",
       })
     )
-    .then(closeTypewriter);
+    .then(() => {
+			closeTypewriter();
+			(document.querySelector('#pointer') as HTMLElement).style.display = 'block';
+		});
   // rendering loop
   const animationLoop = () => {
     if (pauseRender) return;

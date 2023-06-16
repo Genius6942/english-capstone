@@ -111,7 +111,9 @@ export const createObjectBg = (total: number) => {
   div.style.left = "50%";
   div.style.transform = "translateX(-50%)";
   div.style.zIndex = (10 ** 3).toString();
-	div.id = "object-bg"
+	div.style.pointerEvents = 'none';
+	div.style.opacity = '0';
+	div.id = "object-bg";
 
   document.body.appendChild(div);
 };

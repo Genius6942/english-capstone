@@ -81,6 +81,25 @@
         bottom: -100px;
         opacity: 0;
       }
+      @keyframes MoveUpDown {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+			#pointer {
+				animation: MoveUpDown 1s ease infinite;
+			}
+
     </style>
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Red_Arrow_Down.svg/1200px-Red_Arrow_Down.svg.png"
+      class="fixed bottom-[230px] right-[65px] h-[100px] z-10 hidden"
+      id="pointer"
+    />
   </body>
 </html>
